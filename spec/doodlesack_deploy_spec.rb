@@ -19,12 +19,8 @@ describe Doodlesack::Deploy do
 
       Doodlesack::Deploy.run
 
-      read_only = "r"
-      over_the_air_version_file = File.open(
-        OVER_THE_AIR_VERSION_FILE_PATH,
-        read_only,
-      )
-      updated_over_the_air_version_file_content = over_the_air_version_file.read
+      updated_over_the_air_version_file_content = \
+        File.read(OVER_THE_AIR_VERSION_FILE_PATH)
 
       expect(updated_over_the_air_version_file_content).to eq <<~END_OF_STRING
         const OverTheAirVersionNumber = 1
@@ -48,12 +44,8 @@ describe Doodlesack::Deploy do
 
       Doodlesack::Deploy.run
 
-      read_only = "r"
-      over_the_air_version_file = File.open(
-        OVER_THE_AIR_VERSION_FILE_PATH,
-        read_only,
-      )
-      updated_over_the_air_version_file_content = over_the_air_version_file.read
+      updated_over_the_air_version_file_content = \
+        File.read(OVER_THE_AIR_VERSION_FILE_PATH)
 
       expect(updated_over_the_air_version_file_content).to eq <<~END_OF_STRING
         const OverTheAirVersionNumber = 2
