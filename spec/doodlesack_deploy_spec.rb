@@ -29,6 +29,8 @@ describe Doodlesack::Deploy do
 
         export default OverTheAirVersionNumber
       END_OF_STRING
+
+      File.delete(VERSION_NUMBER_FILE)
     end
 
     it "increments the over-the-air version number from 1 to 2" do
@@ -56,6 +58,8 @@ describe Doodlesack::Deploy do
 
         export default OverTheAirVersionNumber
       END_OF_STRING
+
+      File.delete(VERSION_NUMBER_FILE)
     end
 
     it "deploys the build to expo" do
@@ -66,6 +70,8 @@ describe Doodlesack::Deploy do
       Doodlesack::Deploy.run
 
       expect(deploy_instance).to have_received(:system).with("expo publish")
+
+      File.delete(VERSION_NUMBER_FILE)
     end
 
     context "the expo deploy fails" do
@@ -97,6 +103,8 @@ describe Doodlesack::Deploy do
 
           export default OverTheAirVersionNumber
         END_OF_STRING
+
+        File.delete(VERSION_NUMBER_FILE)
       end
     end
   end
