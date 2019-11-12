@@ -10,7 +10,10 @@ describe Doodlesack::Deploy do
 
     context "the version number file does not exist" do
       it "creates the version number file for version: 1" do
-        stub_successful_expo_publish
+        deploy_instance = Doodlesack::Deploy.new
+        allow(Doodlesack::Deploy).to receive(:new).and_return(deploy_instance)
+        allow(deploy_instance).to receive(:system).with("expo publish").and_return(true)
+        allow(deploy_instance).to receive(:`)
 
         Doodlesack::Deploy.run
 
@@ -38,7 +41,10 @@ describe Doodlesack::Deploy do
       END_OF_STRING
       version_number_file.close
 
-      stub_successful_expo_publish
+      deploy_instance = Doodlesack::Deploy.new
+      allow(Doodlesack::Deploy).to receive(:new).and_return(deploy_instance)
+      allow(deploy_instance).to receive(:system).with("expo publish").and_return(true)
+      allow(deploy_instance).to receive(:`)
 
       Doodlesack::Deploy.run
 
@@ -65,7 +71,10 @@ describe Doodlesack::Deploy do
       END_OF_STRING
       version_number_file.close
 
-      stub_successful_expo_publish
+      deploy_instance = Doodlesack::Deploy.new
+      allow(Doodlesack::Deploy).to receive(:new).and_return(deploy_instance)
+      allow(deploy_instance).to receive(:system).with("expo publish").and_return(true)
+      allow(deploy_instance).to receive(:`)
 
       Doodlesack::Deploy.run
 
@@ -180,12 +189,5 @@ describe Doodlesack::Deploy do
       expect(deploy_instance).to have_received(:`)
         .with("git push origin over-the-air-deployed")
     end
-  end
-
-  def stub_successful_expo_publish
-    deploy_instance = Doodlesack::Deploy.new
-    allow(Doodlesack::Deploy).to receive(:new).and_return(deploy_instance)
-    allow(deploy_instance).to receive(:system).with("expo publish").and_return(true)
-    allow(deploy_instance).to receive(:`)
   end
 end
