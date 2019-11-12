@@ -7,7 +7,10 @@ class Doodlesack
     end
 
     def run
-      @version_number = current_version_number
+      @version_number = File
+        .read(VERSION_NUMBER_FILE)
+        .split
+        .detect { |word| /\A\d+\z/ === word }.to_i
       @incremented_version_number = @version_number + 1
 
       update_version_number(@incremented_version_number)
@@ -18,12 +21,6 @@ class Doodlesack
     end
 
     private
-
-    def current_version_number
-      File.read(VERSION_NUMBER_FILE)
-        .split
-        .detect { |word| /\A\d+\z/ === word }.to_i
-    end
 
     def update_version_number(version_number)
       create_new_or_overwrite_existing = "w+"
