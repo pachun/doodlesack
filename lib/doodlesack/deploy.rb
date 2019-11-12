@@ -49,14 +49,8 @@ class Doodlesack
     end
 
     def git_tag_over_the_air_deploy
-       git_remove_old_over_the_air_deploy_tag
-      `git tag -a over-the-air-deployed -m 'over-the-air-deployed'`
-      `git push origin over-the-air-deployed`
-    end
-
-    def git_remove_old_over_the_air_deploy_tag
       `git tag -d over-the-air-deployed`
-      `git push origin --delete over-the-air-deployed`
+      `git tag -a over-the-air-deployed -m 'over-the-air-deployed'`
     end
 
     def create_version_number_file

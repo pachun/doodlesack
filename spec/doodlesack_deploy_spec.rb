@@ -171,8 +171,6 @@ describe Doodlesack::Deploy do
 
       expect(deploy_instance).to have_received(:`)
         .with("git tag -d over-the-air-deployed")
-      expect(deploy_instance).to have_received(:`)
-        .with("git push origin --delete over-the-air-deployed")
     end
 
     it "creates a new over-the-air-deployed git tag" do
@@ -186,8 +184,6 @@ describe Doodlesack::Deploy do
 
       expect(deploy_instance).to have_received(:`)
         .with("git tag -a over-the-air-deployed -m 'over-the-air-deployed'")
-      expect(deploy_instance).to have_received(:`)
-        .with("git push origin over-the-air-deployed")
     end
   end
 end
