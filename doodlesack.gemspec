@@ -5,10 +5,14 @@ Gem::Specification.new do |s|
   s.description  = "Save time building and deploying your Expo React Native app."
   s.authors      = ["Nick Pachulski"]
   s.email        = "nick@pachulski.me"
-  s.files        = ["lib/doodlesack.rb"]
   s.homepage     = "https://github.com/pachun/doodlesack"
   s.license      = "MIT"
   s.executables << "doodlesack"
+
+  s.files        = [
+    "lib/doodlesack.rb",
+    "lib/doodlesack/deploy.rb",
+  ]
 
   s.add_development_dependency "rspec", "~> 3.9.0"
   s.add_development_dependency "simplecov", "~> 0.17.1"
