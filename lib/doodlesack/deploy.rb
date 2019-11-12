@@ -14,9 +14,16 @@ class Doodlesack
 
     def run
       increment_version_number
-      undo_version_number_change unless system("expo publish")
-      `git add #{VERSION_NUMBER_FILE}`
-      `git commit -m 'Increment version number for over the air deploy'`
+      if system("expo publish")
+        `git add #{VERSION_NUMBER_FILE}`
+        `git commit -m 'Increment version number for over the air deploy'`
+        `git tag -d over-the-air-deployed`
+        `git push origin --delete over-the-air-deployed`
+        `git tag -a over-the-air-deployed -m 'over-the-air-deployed'`
+        `git push origin over-the-air-deployed`
+      else
+        undo_version_number_change
+      end
     end
 
     private

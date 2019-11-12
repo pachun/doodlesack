@@ -108,7 +108,7 @@ describe Doodlesack::Deploy do
         allow(Doodlesack::Deploy).to receive(:new).and_return(deploy_instance)
         allow(deploy_instance).to receive(:system).with("expo publish")
           .and_return(false)
-      allow(deploy_instance).to receive(:`)
+        allow(deploy_instance).to receive(:`)
 
         Doodlesack::Deploy.run
 
@@ -120,6 +120,19 @@ describe Doodlesack::Deploy do
 
           export default OverTheAirVersionNumber
         END_OF_STRING
+      end
+
+      it "does not change anything in git" do
+        deploy_instance = Doodlesack::Deploy.new
+        allow(Doodlesack::Deploy).to receive(:new).and_return(deploy_instance)
+        allow(deploy_instance).to receive(:system).with("expo publish")
+          .and_return(false)
+        allow(deploy_instance).to receive(:`)
+
+        Doodlesack::Deploy.run
+
+        expect(deploy_instance).not_to have_received(:`)
+          .with(/\Agit.+/)
       end
     end
 
@@ -138,20 +151,35 @@ describe Doodlesack::Deploy do
         .with("git commit -m 'Increment version number for over the air deploy'")
     end
 
-    # it "deletes the any older over-the-air-deployed git tags" do
-    #   deploy_instance = Doodlesack::Deploy.new
-    #   allow(Doodlesack::Deploy).to receive(:new).and_return(deploy_instance)
-    #   allow(deploy_instance).to receive(:system).with("expo publish")
-    #     .and_return(true)
-    #   allow(deploy_instance).to receive(:`)
-    #
-    #   Doodlesack::Deploy.run
-    #
-    #   expect(deploy_instance).to have_received(:`)
-    #     .with("git tag -d over-the-air-deployed")
-    #   expect(deploy_instance).to have_received(:`)
-    #     .with("git push origin --delete over-the-air-deployed")
-    # end
+    it "deletes the any older over-the-air-deployed git tags" do
+      deploy_instance = Doodlesack::Deploy.new
+      allow(Doodlesack::Deploy).to receive(:new).and_return(deploy_instance)
+      allow(deploy_instance).to receive(:system).with("expo publish")
+        .and_return(true)
+      allow(deploy_instance).to receive(:`)
+
+      Doodlesack::Deploy.run
+
+      expect(deploy_instance).to have_received(:`)
+        .with("git tag -d over-the-air-deployed")
+      expect(deploy_instance).to have_received(:`)
+        .with("git push origin --delete over-the-air-deployed")
+    end
+
+    it "creates a new over-the-air-deployed git tag" do
+      deploy_instance = Doodlesack::Deploy.new
+      allow(Doodlesack::Deploy).to receive(:new).and_return(deploy_instance)
+      allow(deploy_instance).to receive(:system).with("expo publish")
+        .and_return(true)
+      allow(deploy_instance).to receive(:`)
+
+      Doodlesack::Deploy.run
+
+      expect(deploy_instance).to have_received(:`)
+        .with("git tag -a over-the-air-deployed -m 'over-the-air-deployed'")
+      expect(deploy_instance).to have_received(:`)
+        .with("git push origin over-the-air-deployed")
+    end
   end
 
   def stub_successful_expo_publish
