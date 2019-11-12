@@ -1,3 +1,3 @@
-const OverTheAirVersionNumber = 2
+const OverTheAirVersionNumber = 0
 
 export default OverTheAirVersionNumber
