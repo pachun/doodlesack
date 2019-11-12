@@ -7,13 +7,13 @@ class Doodlesack
     end
 
     def run
-      version_number = current_version_number
+      @version_number = current_version_number
+      @incremented_version_number = @version_number + 1
 
-      incremented_version_number = current_version_number + 1
-      update_version_number(incremented_version_number)
+      update_version_number(@incremented_version_number)
 
       if !system("expo publish")
-        update_version_number(version_number)
+        update_version_number(@version_number)
       end
     end
 
