@@ -5,7 +5,6 @@ describe Doodlesack::Deploy do
 
   describe "self#run" do
     it "increments the over-the-air version number from 0 to 1" do
-
       create_new_or_overwrite_existing = "w+"
       version_number_file = File.open(
         VERSION_NUMBER_FILE,
