@@ -15,16 +15,21 @@ class Doodlesack
     end
 
     def run
-      update_version_number(incremented_version_number)
-
-      if !system("expo publish")
-        update_version_number(version_number)
-      end
+      increment_version_number
+      undo_version_number_change unless system("expo publish")
     end
 
     private
 
     attr_reader :version_number, :incremented_version_number
+
+    def increment_version_number
+      update_version_number(incremented_version_number)
+    end
+
+    def undo_version_number_change
+      update_version_number(version_number)
+    end
 
     def update_version_number(version_number)
       create_new_or_overwrite_existing = "w+"
