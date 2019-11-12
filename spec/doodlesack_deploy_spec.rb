@@ -5,7 +5,6 @@ describe Doodlesack::Deploy do
 
   describe "self#run" do
     it "increments the over-the-air version number from 0 to 1" do
-      stub_successful_expo_publish
 
       create_new_or_overwrite_existing = "w+"
       version_number_file = File.open(
@@ -18,6 +17,8 @@ describe Doodlesack::Deploy do
         export default OverTheAirVersionNumber
       END_OF_STRING
       version_number_file.close
+
+      stub_successful_expo_publish
 
       Doodlesack::Deploy.run
 
@@ -32,8 +33,6 @@ describe Doodlesack::Deploy do
     end
 
     it "increments the over-the-air version number from 1 to 2" do
-      stub_successful_expo_publish
-
       create_new_or_overwrite_existing = "w+"
       version_number_file = File.open(
         VERSION_NUMBER_FILE,
@@ -45,6 +44,8 @@ describe Doodlesack::Deploy do
         export default OverTheAirVersionNumber
       END_OF_STRING
       version_number_file.close
+
+      stub_successful_expo_publish
 
       Doodlesack::Deploy.run
 

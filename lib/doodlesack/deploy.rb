@@ -6,21 +6,25 @@ class Doodlesack
       new.run
     end
 
-    def run
+    def initialize
       @version_number = File
         .read(VERSION_NUMBER_FILE)
         .split
         .detect { |word| /\A\d+\z/ === word }.to_i
       @incremented_version_number = @version_number + 1
+    end
 
-      update_version_number(@incremented_version_number)
+    def run
+      update_version_number(incremented_version_number)
 
       if !system("expo publish")
-        update_version_number(@version_number)
+        update_version_number(version_number)
       end
     end
 
     private
+
+    attr_reader :version_number, :incremented_version_number
 
     def update_version_number(version_number)
       create_new_or_overwrite_existing = "w+"
