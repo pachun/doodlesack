@@ -1,3 +1,5 @@
+require "doodlesack/deploy"
+
 class Doodlesack
   def self.run(command_line_arguments)
     new(command_line_arguments).run
@@ -41,10 +43,5 @@ class Doodlesack
 
   def print_git_instructions
     puts "Nothing was deployed because you need to commit your changes to git first."
-  end
-
-  class Deploy
-    def self.run
-    end
   end
 end
