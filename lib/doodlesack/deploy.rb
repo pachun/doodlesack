@@ -36,11 +36,11 @@ class Doodlesack
     end
 
     def increment_version_number
-      update_version_number(incremented_version_number)
+      set_version_number(incremented_version_number)
     end
 
     def undo_version_number_change
-      update_version_number(version_number)
+      set_version_number(version_number)
     end
 
     def git_commit_version_number_file
@@ -54,20 +54,10 @@ class Doodlesack
     end
 
     def create_version_number_file
-      create_new_or_overwrite_existing = "w+"
-      version_number_file = File.open(
-        VERSION_NUMBER_FILE,
-        create_new_or_overwrite_existing,
-      )
-      version_number_file.write <<~END_OF_STRING
-        const OverTheAirVersionNumber = 0
-
-        export default OverTheAirVersionNumber
-      END_OF_STRING
-      version_number_file.close
+      set_version_number(0)
     end
 
-    def update_version_number(version_number)
+    def set_version_number(version_number)
       create_new_or_overwrite_existing = "w+"
       version_number_file = File.open(
         VERSION_NUMBER_FILE,
