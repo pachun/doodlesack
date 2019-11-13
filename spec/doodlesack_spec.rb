@@ -2,16 +2,6 @@ require "spec_helper"
 
 describe Doodlesack do
   describe "self#run(command_line_arguments)" do
-    context "command_line_arguments is an empty array" do
-      it "prints a usage description" do
-        expect do
-          Doodlesack.run([])
-        end.to(
-          output("USAGE: doodlesack [setup|deploy]\n").to_stdout
-        )
-      end
-    end
-
     context "the command is not a doodlesack command" do
       it "prints a usage description" do
         expect do

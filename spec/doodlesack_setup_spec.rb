@@ -15,6 +15,8 @@ describe Doodlesack::Setup do
 
         export default OverTheAirVersionNumber
       END_OF_STRING
+
+      File.delete(Doodlesack::VERSION_NUMBER_FILE)
     end
   end
 end
