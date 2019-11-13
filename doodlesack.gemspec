@@ -11,6 +11,7 @@ Gem::Specification.new do |s|
 
   s.files        = [
     "lib/doodlesack.rb",
+    "lib/doodlesack/setup.rb",
     "lib/doodlesack/deploy.rb",
   ]
 

@@ -1,4 +1,5 @@
 require "doodlesack/deploy"
+require "doodlesack/setup"
 
 class Doodlesack
   def self.run(command_line_arguments)
@@ -16,9 +17,11 @@ class Doodlesack
       print_usage_description
     elsif !in_an_expo_project_directory?
       print_expo_instructions
+    elsif command_line_arguments.first == "setup"
+      Doodlesack::Setup.run
     elsif !git_status_is_clean?
       print_git_instructions
-    else
+    elsif command_line_arguments.first == "deploy"
       Doodlesack::Deploy.run
     end
   end
@@ -34,7 +37,7 @@ class Doodlesack
   end
 
   def print_usage_description
-    puts "USAGE: doodlesack deploy"
+    puts "USAGE: doodlesack [init|deploy]"
   end
 
   def print_expo_instructions
