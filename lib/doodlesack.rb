@@ -37,7 +37,7 @@ class Doodlesack
   end
 
   def print_usage_description
-    puts "USAGE: doodlesack [init|deploy]"
+    puts "USAGE: doodlesack [setup|deploy]"
   end
 
   def print_expo_instructions

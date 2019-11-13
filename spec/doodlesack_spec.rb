@@ -7,7 +7,7 @@ describe Doodlesack do
         expect do
           Doodlesack.run([])
         end.to(
-          output("USAGE: doodlesack [init|deploy]\n").to_stdout
+          output("USAGE: doodlesack [setup|deploy]\n").to_stdout
         )
       end
     end

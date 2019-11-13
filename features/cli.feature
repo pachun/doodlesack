@@ -4,4 +4,4 @@ Feature: doodlesack
 
   Scenario: Running without arguments
     When I run `doodlesack`
-    Then the output should contain "USAGE: doodlesack [init|deploy]"
+    Then the output should contain "USAGE: doodlesack [setup|deploy]"
