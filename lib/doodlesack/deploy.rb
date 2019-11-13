@@ -1,13 +1,11 @@
 class Doodlesack
   class Deploy
-    VERSION_NUMBER_FILE = "OverTheAirVersion.ts"
-
     def self.run
       new.run
     end
 
     def initialize
-      unless File.exist?(VERSION_NUMBER_FILE)
+      unless File.exist?(Doodlesack::VERSION_NUMBER_FILE)
         create_version_number_file
       end
     end
@@ -26,7 +24,7 @@ class Doodlesack
 
     def version_number
       @version_number ||= File
-        .read(VERSION_NUMBER_FILE)
+        .read(Doodlesack::VERSION_NUMBER_FILE)
         .split
         .detect { |word| /\A\d+\z/ === word }.to_i
     end
@@ -44,7 +42,7 @@ class Doodlesack
     end
 
     def git_commit_version_number_file
-      `git add #{VERSION_NUMBER_FILE}`
+      `git add #{Doodlesack::VERSION_NUMBER_FILE}`
       `git commit -m 'Increment version number for over the air deploy'`
     end
 
@@ -60,7 +58,7 @@ class Doodlesack
     def set_version_number(version_number)
       create_new_or_overwrite_existing = "w+"
       version_number_file = File.open(
-        VERSION_NUMBER_FILE,
+        Doodlesack::VERSION_NUMBER_FILE,
         create_new_or_overwrite_existing,
       )
       version_number_file.write <<~END_OF_STRING
