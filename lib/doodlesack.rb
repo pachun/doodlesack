@@ -2,6 +2,8 @@ require "doodlesack/deploy"
 require "doodlesack/setup"
 
 class Doodlesack
+  VERSION_NUMBER_FILE = "OverTheAirVersion.ts"
+
   def self.run(command_line_arguments)
     new(command_line_arguments).run
   end

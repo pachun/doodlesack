@@ -3,7 +3,7 @@ require "spec_helper"
 describe Doodlesack::Deploy do
   describe "self#run" do
     after(:each) do
-      File.delete(VERSION_NUMBER_FILE)
+      File.delete(Doodlesack::VERSION_NUMBER_FILE)
     end
 
     context "the version number file does not exist" do
@@ -16,7 +16,7 @@ describe Doodlesack::Deploy do
         Doodlesack::Deploy.run
 
         updated_version_number_file_content = \
-          File.read(VERSION_NUMBER_FILE)
+          File.read(Doodlesack::VERSION_NUMBER_FILE)
 
         expect(updated_version_number_file_content).to eq <<~END_OF_STRING
           const OverTheAirVersionNumber = 1
@@ -29,7 +29,7 @@ describe Doodlesack::Deploy do
     it "increments the over-the-air version number from 0 to 1" do
       create_new_or_overwrite_existing = "w+"
       version_number_file = File.open(
-        VERSION_NUMBER_FILE,
+        Doodlesack::VERSION_NUMBER_FILE,
         create_new_or_overwrite_existing,
       )
       version_number_file.write <<~END_OF_STRING
@@ -47,7 +47,7 @@ describe Doodlesack::Deploy do
       Doodlesack::Deploy.run
 
       updated_version_number_file_content = \
-        File.read(VERSION_NUMBER_FILE)
+        File.read(Doodlesack::VERSION_NUMBER_FILE)
 
       expect(updated_version_number_file_content).to eq <<~END_OF_STRING
         const OverTheAirVersionNumber = 1
@@ -59,7 +59,7 @@ describe Doodlesack::Deploy do
     it "increments the over-the-air version number from 1 to 2" do
       create_new_or_overwrite_existing = "w+"
       version_number_file = File.open(
-        VERSION_NUMBER_FILE,
+        Doodlesack::VERSION_NUMBER_FILE,
         create_new_or_overwrite_existing,
       )
       version_number_file.write <<~END_OF_STRING
@@ -77,7 +77,7 @@ describe Doodlesack::Deploy do
       Doodlesack::Deploy.run
 
       updated_version_number_file_content = \
-        File.read(VERSION_NUMBER_FILE)
+        File.read(Doodlesack::VERSION_NUMBER_FILE)
 
       expect(updated_version_number_file_content).to eq <<~END_OF_STRING
         const OverTheAirVersionNumber = 2
@@ -101,7 +101,7 @@ describe Doodlesack::Deploy do
       it "does not change the over-the-air version number" do
         create_new_or_overwrite_existing = "w+"
         version_number_file = File.open(
-          VERSION_NUMBER_FILE,
+          Doodlesack::VERSION_NUMBER_FILE,
           create_new_or_overwrite_existing,
         )
         version_number_file.write <<~END_OF_STRING
@@ -120,7 +120,7 @@ describe Doodlesack::Deploy do
         Doodlesack::Deploy.run
 
         updated_version_number_file_content = \
-          File.read(VERSION_NUMBER_FILE)
+          File.read(Doodlesack::VERSION_NUMBER_FILE)
 
         expect(updated_version_number_file_content).to eq <<~END_OF_STRING
           const OverTheAirVersionNumber = 2
@@ -153,7 +153,7 @@ describe Doodlesack::Deploy do
       Doodlesack::Deploy.run
 
       expect(deploy_instance).to have_received(:`)
-        .with("git add #{VERSION_NUMBER_FILE}")
+        .with("git add #{Doodlesack::VERSION_NUMBER_FILE}")
       expect(deploy_instance).to have_received(:`)
         .with("git commit -m 'Increment version number for over the air deploy'")
     end
