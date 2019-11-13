@@ -11,7 +11,7 @@ describe Doodlesack::Deploy do
         deploy_instance = Doodlesack::Deploy.new
         allow(Doodlesack::Deploy).to receive(:new).and_return(deploy_instance)
         allow(deploy_instance).to receive(:system).with("expo publish").and_return(true)
-        allow(deploy_instance).to receive(:`)
+        stub_git
 
         Doodlesack::Deploy.run
 
@@ -42,7 +42,7 @@ describe Doodlesack::Deploy do
       deploy_instance = Doodlesack::Deploy.new
       allow(Doodlesack::Deploy).to receive(:new).and_return(deploy_instance)
       allow(deploy_instance).to receive(:system).with("expo publish").and_return(true)
-      allow(deploy_instance).to receive(:`)
+      stub_git
 
       Doodlesack::Deploy.run
 
@@ -72,7 +72,7 @@ describe Doodlesack::Deploy do
       deploy_instance = Doodlesack::Deploy.new
       allow(Doodlesack::Deploy).to receive(:new).and_return(deploy_instance)
       allow(deploy_instance).to receive(:system).with("expo publish").and_return(true)
-      allow(deploy_instance).to receive(:`)
+      stub_git
 
       Doodlesack::Deploy.run
 
@@ -90,7 +90,7 @@ describe Doodlesack::Deploy do
       deploy_instance = Doodlesack::Deploy.new
       allow(Doodlesack::Deploy).to receive(:new).and_return(deploy_instance)
       allow(deploy_instance).to receive(:system)
-      allow(deploy_instance).to receive(:`)
+      stub_git
 
       Doodlesack::Deploy.run
 
@@ -115,7 +115,7 @@ describe Doodlesack::Deploy do
         allow(Doodlesack::Deploy).to receive(:new).and_return(deploy_instance)
         allow(deploy_instance).to receive(:system).with("expo publish")
           .and_return(false)
-        allow(deploy_instance).to receive(:`)
+        stub_git
 
         Doodlesack::Deploy.run
 
@@ -148,14 +148,14 @@ describe Doodlesack::Deploy do
       allow(Doodlesack::Deploy).to receive(:new).and_return(deploy_instance)
       allow(deploy_instance).to receive(:system).with("expo publish")
         .and_return(true)
-      allow(deploy_instance).to receive(:`)
+      stub_git
 
       Doodlesack::Deploy.run
 
-      expect(deploy_instance).to have_received(:`)
-        .with("git add #{Doodlesack::VERSION_NUMBER_FILE}")
-      expect(deploy_instance).to have_received(:`)
-        .with("git commit -m 'Increment version number for over the air deploy'")
+      expect(Doodlesack::Git).to have_received(:add)
+        .with(Doodlesack::VERSION_NUMBER_FILE)
+      expect(Doodlesack::Git).to have_received(:commit)
+        .with("Increment version number for over the air deploy")
     end
 
     it "deletes the any older over-the-air-deployed git tags" do
@@ -163,12 +163,12 @@ describe Doodlesack::Deploy do
       allow(Doodlesack::Deploy).to receive(:new).and_return(deploy_instance)
       allow(deploy_instance).to receive(:system).with("expo publish")
         .and_return(true)
-      allow(deploy_instance).to receive(:`)
+      stub_git
 
       Doodlesack::Deploy.run
 
-      expect(deploy_instance).to have_received(:`)
-        .with("git tag -d over-the-air-deployed")
+      expect(Doodlesack::Git).to have_received(:delete_tag)
+        .with("over-the-air-deployed")
     end
 
     it "creates a new over-the-air-deployed git tag" do
@@ -176,12 +176,19 @@ describe Doodlesack::Deploy do
       allow(Doodlesack::Deploy).to receive(:new).and_return(deploy_instance)
       allow(deploy_instance).to receive(:system).with("expo publish")
         .and_return(true)
-      allow(deploy_instance).to receive(:`)
+      stub_git
 
       Doodlesack::Deploy.run
 
-      expect(deploy_instance).to have_received(:`)
-        .with("git tag -a over-the-air-deployed -m 'over-the-air-deployed'")
+      expect(Doodlesack::Git).to have_received(:tag)
+        .with("over-the-air-deployed")
     end
+  end
+
+  def stub_git
+    allow(Doodlesack::Git).to receive(:add)
+    allow(Doodlesack::Git).to receive(:commit)
+    allow(Doodlesack::Git).to receive(:tag)
+    allow(Doodlesack::Git).to receive(:delete_tag)
   end
 end

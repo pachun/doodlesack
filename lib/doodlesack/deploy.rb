@@ -42,13 +42,13 @@ class Doodlesack
     end
 
     def git_commit_version_number_file
-      `git add #{Doodlesack::VERSION_NUMBER_FILE}`
-      `git commit -m 'Increment version number for over the air deploy'`
+      Doodlesack::Git.add(Doodlesack::VERSION_NUMBER_FILE)
+      Doodlesack::Git.commit("Increment version number for over the air deploy")
     end
 
     def git_tag_over_the_air_deploy
-      `git tag -d over-the-air-deployed`
-      `git tag -a over-the-air-deployed -m 'over-the-air-deployed'`
+      Doodlesack::Git.delete_tag("over-the-air-deployed")
+      Doodlesack::Git.tag("over-the-air-deployed")
     end
 
     def create_version_number_file

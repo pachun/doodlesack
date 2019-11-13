@@ -1,5 +1,6 @@
 require "doodlesack/deploy"
 require "doodlesack/setup"
+require "doodlesack/git"
 
 class Doodlesack
   VERSION_NUMBER_FILE = "OverTheAirVersion.ts"
