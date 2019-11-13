@@ -12,6 +12,16 @@ describe Doodlesack do
       end
     end
 
+    context "the command is not a doodlesack command" do
+      it "prints a usage description" do
+        expect do
+          Doodlesack.run(["not_a_doodlesack_command"])
+        end.to(
+          output("USAGE: doodlesack [setup|deploy]\n").to_stdout
+        )
+      end
+    end
+
     context "the command is not called from within an Expo project directory" do
       it "instructs the user to run the command in an Expo project directory" do
         allow(Doodlesack::Deploy).to receive(:run)

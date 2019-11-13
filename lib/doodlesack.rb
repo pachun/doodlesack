@@ -15,7 +15,7 @@ class Doodlesack
   end
 
   def run
-    if command_line_arguments.empty?
+    if command_line_arguments.first != "setup" && command_line_arguments.first != "deploy"
       print_usage_description
     elsif !in_an_expo_project_directory?
       print_expo_instructions
