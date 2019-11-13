@@ -1,8 +1,6 @@
 require "spec_helper"
 
 describe Doodlesack::Setup do
-  VERSION_NUMBER_FILE = "OverTheAirVersion.ts"
-
   describe "self#run" do
     it "creates the version number file for version: 0" do
       Doodlesack::Setup.run

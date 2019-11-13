@@ -5,4 +5,6 @@ if ENV["COVERAGE"]
   SimpleCov.start
 end
 
+VERSION_NUMBER_FILE = "OverTheAirVersion.ts"
+
 require "doodlesack"

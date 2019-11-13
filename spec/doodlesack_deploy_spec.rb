@@ -1,8 +1,6 @@
 require "spec_helper"
 
 describe Doodlesack::Deploy do
-  VERSION_NUMBER_FILE = "OverTheAirVersion.ts"
-
   describe "self#run" do
     after(:each) do
       File.delete(VERSION_NUMBER_FILE)
