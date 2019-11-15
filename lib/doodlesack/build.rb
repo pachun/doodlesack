@@ -8,10 +8,11 @@ class Doodlesack::Build
   def run
     ask_for_type_of_update
 
-    bump_version
-
-    _, error, _ = Open3.capture3("expo build:ios")
-    puts error
+    _, error, status = Open3.capture3("expo build:ios")
+    print "#{error}\n"
+    if status == 0
+      bump_version
+    end
   end
 
   private
