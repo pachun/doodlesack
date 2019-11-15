@@ -6,19 +6,21 @@ describe Doodlesack::Build do
   end
 
   it "asks the user which type of update they're building for" do
+    stub_expo_build
     write_app_json(with_version: "1.0.0")
     allow($stdin).to receive(:gets).and_return("\n")
 
     expect {
       Doodlesack::Build.run
     }.to output(
-      "Which type of update? [major|minor|patch] (default is patch)"
+      /Which type of update\? \[major\|minor\|patch\] \(default is patch\)/
     ).to_stdout
   end
 
   context "the user responds to the build type question with 'major'" do
     it "bumps the major version number in app.json" do
       stub_prints
+      stub_expo_build
       write_app_json(with_version: "1.0.0")
       allow($stdin).to receive(:gets).and_return("major\n")
 
@@ -37,6 +39,7 @@ describe Doodlesack::Build do
   context "the user responds to the build type question with 'minor'" do
     it "bumps the minor version number in app.json" do
       stub_prints
+      stub_expo_build
       write_app_json(with_version: "1.0.0")
       allow($stdin).to receive(:gets).and_return("minor\n")
 
@@ -55,6 +58,7 @@ describe Doodlesack::Build do
   context "the user responds to the build type question with 'patch'" do
     it "bumps the patch version number in app.json" do
       stub_prints
+      stub_expo_build
       write_app_json(with_version: "1.0.0")
       allow($stdin).to receive(:gets).and_return("patch\n")
 
@@ -70,41 +74,33 @@ describe Doodlesack::Build do
     end
   end
 
-  # it "builds the ios app" do
-  #   File.open("app.json", "w+") do |file|
-  #     file.write(app_json_content_with_version("1.0.0"))
-  #   end
-  #   allow(Doodlesack::Build).to receive(:print)
-  #   allow($stdin).to receive(:gets).and_return("patch\n")
-  #   allow(Open3).to receive(:capture3)
-  #
-  #   Doodlesack::Build.run
-  #
-  #   expect(Open3).to have_received(:capture3).with("expo build:ios")
-  # end
+  it "builds the ios app" do
+    stub_prints
+    write_app_json(with_version: "1.0.0")
+    allow($stdin).to receive(:gets).and_return("patch\n")
+    allow(Open3).to receive(:capture3)
+
+    Doodlesack::Build.run
+
+    expect(Open3).to have_received(:capture3).with("expo build:ios")
+  end
 
   context "the ios app build fails" do
-    # it "prints the error returned by `expo build:ios`" do
-    #   File.open("app.json", "w+") do |file|
-    #     file.write(app_json_content_with_version("1.0.0"))
-    #   end
-    #   allow(Doodlesack::Build).to receive(:print)
-    #   allow($stdin).to receive(:gets).and_return("patch\n")
-    #   standard_output = nil
-    #   standard_error = "FAKE ERROR"
-    #   exit_status = 1
-    #   allow(Open3).to receive(:capture3).with("expo build:ios").and_return([
-    #     standard_output,
-    #     standard_error,
-    #     exit_status,
-    #   ])
-    #
-    #   expect {
-    #     Doodlesack::Build.run
-    #   }.to output(
-    #     "FAKE ERROR\n"
-    #   ).to_stdout
-    # end
+    it "prints the error returned by `expo build:ios`" do
+      write_app_json(with_version: "1.0.0")
+      allow($stdin).to receive(:gets).and_return("patch\n")
+      allow(Open3).to receive(:capture3).with("expo build:ios").and_return([
+        nil,
+        "some error",
+        1,
+      ])
+
+      expect {
+        Doodlesack::Build.run
+      }.to output(
+        /some error/
+      ).to_stdout
+    end
 
     # it "does not modify the version in app.json" do
     #   File.open("app.json", "w+") do |file|
@@ -164,8 +160,13 @@ describe Doodlesack::Build do
 
   def stub_prints
     build_instance = Doodlesack::Build.new
+    allow(build_instance).to receive(:puts)
     allow(build_instance).to receive(:print)
     allow(Doodlesack::Build).to receive(:new).and_return(build_instance)
+  end
+
+  def stub_expo_build
+    allow(Open3).to receive(:capture3).with("expo build:ios")
   end
 
   def write_app_json(with_version:)
