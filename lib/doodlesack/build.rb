@@ -17,6 +17,10 @@ class Doodlesack::Build
     end
 
     bump_version
+
+    tempfile = URI.parse("https://hello.world").open
+    tempfile.close
+    FileUtils.mv(tempfile.path, "ios_build.ipa")
   end
 
   private

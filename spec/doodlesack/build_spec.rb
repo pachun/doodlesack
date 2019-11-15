@@ -163,31 +163,31 @@ describe Doodlesack::Build do
     end
   end
 
-  # it "downloads the built ios .ipa file" do
-  #   ok_exit_status = 0
-  #   build_link = "https://hello.world"
-  #   write_app_json(with_version: "1.0.0")
-  #   allow($stdin).to receive(:gets).and_return("patch\n")
-  #   allow(Open3).to receive(:capture3).with("expo build:ios").and_return([
-  #     successful_expo_build_output(build_link: build_link),
-  #     "",
-  #     ok_exit_status,
-  #   ])
-  #
-  #   fake_path = instance_double(String)
-  #   fake_tempfile = double
-  #   http_double = instance_double(URI::HTTP)
-  #   allow(fake_tempfile).to receive(:path).and_return(fake_path)
-  #   allow(URI).to receive(:parse).with(build_link).and_return(fake_tempfile)
-  #   allow(fake_tempfile).to receive(:open).and_return(http_double)
-  #   allow(fake_tempfile).to receive(:close)
-  #   allow(FileUtils).to receive(:mv)
-  #
-  #   Doodlesack::Build.run
-  #
-  #   expect(fake_tempfile).to have_received(:close)
-  #   expect(FileUtils).to have_received(:mv).with(fake_path, "ios_build.ipa")
-  # end
+  it "downloads the built ios .ipa file" do
+    ok_exit_status = 0
+    build_link = "https://hello.world"
+    write_app_json(with_version: "1.0.0")
+    allow($stdin).to receive(:gets).and_return("patch\n")
+    allow(Open3).to receive(:capture3).with("expo build:ios").and_return([
+      successful_expo_build_output(build_link: build_link),
+      "",
+      ok_exit_status,
+    ])
+
+    fake_path = instance_double(String)
+    fake_tempfile = double
+    http_double = instance_double(URI::HTTP)
+    allow(fake_tempfile).to receive(:path).and_return(fake_path)
+    allow(URI).to receive(:parse).with(build_link).and_return(http_double)
+    allow(http_double).to receive(:open).and_return(fake_tempfile)
+    allow(fake_tempfile).to receive(:close)
+    allow(FileUtils).to receive(:mv)
+
+    Doodlesack::Build.run
+
+    expect(fake_tempfile).to have_received(:close)
+    expect(FileUtils).to have_received(:mv).with(fake_path, "ios_build.ipa")
+  end
 
   def successful_expo_build_output(build_link:)
     <<~END_OF_STRING
