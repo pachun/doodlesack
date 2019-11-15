@@ -135,6 +135,22 @@ describe Doodlesack::Build do
         Doodlesack::Build.run
       }.not_to change { File.read("app.json") }
     end
+
+    it "exits the program" do
+      error_exit_status = 1
+      stub_prints
+      write_app_json(with_version: "1.0.0")
+      allow($stdin).to receive(:gets).and_return("patch\n")
+      allow(Open3).to receive(:capture3).with("expo build:ios").and_return([
+        nil,
+        "some error",
+        error_exit_status,
+      ])
+
+      expect {
+        Doodlesack::Build.run
+      }.to raise_error SystemExit
+    end
   end
 
   def app_json_content_with_version(version)

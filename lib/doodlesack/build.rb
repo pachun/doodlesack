@@ -13,6 +13,7 @@ class Doodlesack::Build
       bump_version
     else
       print "#{error}\n"
+      exit
     end
   end
 
