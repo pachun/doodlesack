@@ -10,12 +10,12 @@ class Doodlesack
     end
 
     def bump
-      if type == :patch
-        patch_version_bump
-      elsif type == :minor
+      if type == :minor
         minor_version_bump
       elsif type == :major
         major_version_bump
+      else
+        patch_version_bump
       end
     end
 

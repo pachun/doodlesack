@@ -2,6 +2,14 @@ require "spec_helper"
 
 describe Doodlesack::SemanticVersion do
   describe "self#bump(version, type)" do
+    context "version type is none of :patch :minor :major" do
+      it "defaults to a :patch type update" do
+        expect(Doodlesack::SemanticVersion.bump("0.0.0", :asdf)).to eq("0.0.1")
+
+        expect(Doodlesack::SemanticVersion.bump("1.1.1", :wxyz)).to eq("1.1.2")
+      end
+    end
+
     context "type is :patch" do
       it "returns 0.0.1 given version 0.0.0" do
         expect(Doodlesack::SemanticVersion.bump("0.0.0", :patch)).to eq("0.0.1")
