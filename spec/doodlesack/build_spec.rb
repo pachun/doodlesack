@@ -85,14 +85,32 @@ describe Doodlesack::Build do
     expect(Open3).to have_received(:capture3).with("expo build:ios")
   end
 
+  it "does not print an error" do
+    ok_exit_status = 0
+    write_app_json(with_version: "1.0.0")
+    allow($stdin).to receive(:gets).and_return("patch\n")
+    allow(Open3).to receive(:capture3).with("expo build:ios").and_return([
+      "",
+      "error",
+      ok_exit_status,
+    ])
+
+    expect {
+      Doodlesack::Build.run
+    }.not_to output(
+      /error/
+    ).to_stdout
+  end
+
   context "the ios app build fails" do
     it "prints the error returned by `expo build:ios`" do
+      error_exit_status = 1
       write_app_json(with_version: "1.0.0")
       allow($stdin).to receive(:gets).and_return("patch\n")
       allow(Open3).to receive(:capture3).with("expo build:ios").and_return([
-        nil,
+        "",
         "some error",
-        1,
+        error_exit_status,
       ])
 
       expect {
@@ -103,13 +121,14 @@ describe Doodlesack::Build do
     end
 
     it "does not modify the version in app.json" do
+      error_exit_status = 1
       stub_prints
       write_app_json(with_version: "1.0.0")
       allow($stdin).to receive(:gets).and_return("patch\n")
       allow(Open3).to receive(:capture3).with("expo build:ios").and_return([
         nil,
         "some error",
-        1,
+        error_exit_status,
       ])
 
       expect {
