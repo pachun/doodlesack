@@ -163,6 +163,69 @@ describe Doodlesack::Build do
     end
   end
 
+  # it "downloads the built ios .ipa file" do
+  #   ok_exit_status = 0
+  #   build_link = "https://hello.world"
+  #   write_app_json(with_version: "1.0.0")
+  #   allow($stdin).to receive(:gets).and_return("patch\n")
+  #   allow(Open3).to receive(:capture3).with("expo build:ios").and_return([
+  #     successful_expo_build_output(build_link: build_link),
+  #     "",
+  #     ok_exit_status,
+  #   ])
+  #
+  #   fake_path = instance_double(String)
+  #   fake_tempfile = double
+  #   http_double = instance_double(URI::HTTP)
+  #   allow(fake_tempfile).to receive(:path).and_return(fake_path)
+  #   allow(URI).to receive(:parse).with(build_link).and_return(fake_tempfile)
+  #   allow(fake_tempfile).to receive(:open).and_return(http_double)
+  #   allow(fake_tempfile).to receive(:close)
+  #   allow(FileUtils).to receive(:mv)
+  #
+  #   Doodlesack::Build.run
+  #
+  #   expect(fake_tempfile).to have_received(:close)
+  #   expect(FileUtils).to have_received(:mv).with(fake_path, "ios_build.ipa")
+  # end
+
+  def successful_expo_build_output(build_link:)
+    <<~END_OF_STRING
+      Checking if there is a build in progress...
+
+      Publishing to channel 'default'...
+      Building iOS bundle
+      Building Android bundle
+      Analyzing assets
+      Uploading assets
+      No assets changed, skipped.
+      Processing asset bundle patterns:
+      - /Users/pachun/code/doodles/**/*
+      Uploading JavaScript bundles
+      Published
+      Your URL is
+
+      https://exp.host/@pachun/doodles
+
+      Checking if this build already exists...
+
+      Build started, it may take a few minutes to complete.
+      You can check the queue length at https://expo.io/turtle-status
+
+      You can make this faster. 🐢
+      Get priority builds at: https://expo.io/settings/billing
+
+      You can monitor the build at
+
+      https://expo.io/builds/09cc69ed-b8e3-4d03-b208-de683fde3860
+
+      Waiting for build to complete. You can press Ctrl+C to exit.
+      ✔ Build finished.
+      Successfully built standalone app: #{build_link}
+      ✨  Done in 540.25s.
+    END_OF_STRING
+  end
+
   def app_json_content_with_version(version)
     <<~END_OF_STRING
     {

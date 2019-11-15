@@ -1,4 +1,5 @@
 require "open3"
+require "open-uri"
 
 class Doodlesack::Build
   def self.run
@@ -9,12 +10,13 @@ class Doodlesack::Build
     ask_for_type_of_update
 
     _, error, status = Open3.capture3("expo build:ios")
-    if status == 0
-      bump_version
-    else
+    if status != 0
       print "#{error}\n"
       exit
+      return
     end
+
+    bump_version
   end
 
   private
