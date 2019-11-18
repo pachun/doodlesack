@@ -7,29 +7,48 @@ class Doodlesack::Build
   end
 
   def run
-    ask_for_type_of_update
-
-    update_version(bumped_version)
-
-    build_output, error, status = Open3.capture3("expo build:ios")
-    if status != 0
-      update_version(original_version)
-      print "#{error}\n"
-    else
-      download_build(build_link_from(build_output))
+    bump_version
+    build
+    if build_succeeded?
+      download_build
       upload_build_to_appstore_connect
       delete_downloaded_build
+    else
+      unbump_version
+      print "#{build_error}\n"
     end
   end
 
   private
 
-  attr_reader :type_of_update
+  attr_reader :type_of_update, :build_output, :build_error, :build_command_status
 
-  def download_build(build_link_url)
+  def unbump_version
+    update_version(original_version)
+  end
+
+  def build_succeeded?
+    build_command_status == 0
+  end
+
+  def build
+    @build_output, @build_error, @build_command_status = \
+      Open3.capture3("expo build:ios")
+  end
+
+  def bump_version
+    ask_for_type_of_update
+    update_version(bumped_version)
+  end
+
+  def download_build
     tempfile = URI.parse(build_link_url).open
     tempfile.close
     FileUtils.mv(tempfile.path, "ios_build.ipa")
+  end
+
+  def build_link_url
+    build_link_from(build_output)
   end
 
   def ask_for_type_of_update
