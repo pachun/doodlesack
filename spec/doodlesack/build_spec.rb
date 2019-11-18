@@ -5,6 +5,7 @@ describe Doodlesack::Build do
 
   before(:each) do
     allow(Doodlesack::Build).to receive(:new).and_return(build_instance)
+    allow(build_instance).to receive(:system)
   end
 
   after(:each) do
@@ -12,6 +13,7 @@ describe Doodlesack::Build do
   end
 
   it "asks the user which type of update they're building for" do
+    allow(build_instance).to receive(:download_build)
     stub_expo_build
     write_app_json(with_version: "1.0.0")
     allow($stdin).to receive(:gets).and_return("\n")
@@ -26,6 +28,7 @@ describe Doodlesack::Build do
   context "the user responds to the build type question with 'major'" do
     it "bumps the major version number in app.json" do
       allow(build_instance).to receive(:print)
+      allow(build_instance).to receive(:download_build)
       stub_expo_build
       write_app_json(with_version: "1.0.0")
       allow($stdin).to receive(:gets).and_return("major\n")
@@ -45,6 +48,7 @@ describe Doodlesack::Build do
   context "the user responds to the build type question with 'minor'" do
     it "bumps the minor version number in app.json" do
       allow(build_instance).to receive(:print)
+      allow(build_instance).to receive(:download_build)
       stub_expo_build
       write_app_json(with_version: "1.0.0")
       allow($stdin).to receive(:gets).and_return("minor\n")
@@ -64,6 +68,7 @@ describe Doodlesack::Build do
   context "the user responds to the build type question with 'patch'" do
     it "bumps the patch version number in app.json" do
       allow(build_instance).to receive(:print)
+      allow(build_instance).to receive(:download_build)
       stub_expo_build
       write_app_json(with_version: "1.0.0")
       allow($stdin).to receive(:gets).and_return("patch\n")
@@ -81,6 +86,7 @@ describe Doodlesack::Build do
   end
 
   it "builds the ios app" do
+    allow(build_instance).to receive(:download_build)
     ok_exit_status = 0
     allow(build_instance).to receive(:print)
     write_app_json(with_version: "1.0.0")
@@ -95,6 +101,7 @@ describe Doodlesack::Build do
   it "does not print an error" do
     ok_exit_status = 0
     write_app_json(with_version: "1.0.0")
+    allow(build_instance).to receive(:download_build)
     allow($stdin).to receive(:gets).and_return("patch\n")
     allow(Open3).to receive(:capture3).with("expo build:ios").and_return([
       "",
@@ -113,7 +120,6 @@ describe Doodlesack::Build do
     it "prints the error returned by `expo build:ios`" do
       error_exit_status = 1
       write_app_json(with_version: "1.0.0")
-      allow(build_instance).to receive(:exit)
       allow($stdin).to receive(:gets).and_return("patch\n")
       allow(Open3).to receive(:capture3).with("expo build:ios").and_return([
         "",
@@ -131,7 +137,6 @@ describe Doodlesack::Build do
     it "does not modify the version in app.json" do
       error_exit_status = 1
       allow(build_instance).to receive(:print)
-      allow(build_instance).to receive(:exit)
       write_app_json(with_version: "1.0.0")
       allow($stdin).to receive(:gets).and_return("patch\n")
       allow(Open3).to receive(:capture3).with("expo build:ios").and_return([
@@ -145,10 +150,10 @@ describe Doodlesack::Build do
       }.not_to change { File.read("app.json") }
     end
 
-    it "exits the program" do
+    it "does not download anything" do
       error_exit_status = 1
+      allow(build_instance).to receive(:download_build)
       allow(build_instance).to receive(:print)
-      allow(build_instance).to receive(:exit)
       write_app_json(with_version: "1.0.0")
       allow($stdin).to receive(:gets).and_return("patch\n")
       allow(Open3).to receive(:capture3).with("expo build:ios").and_return([
@@ -159,14 +164,74 @@ describe Doodlesack::Build do
 
       Doodlesack::Build.run
 
-      expect(build_instance).to have_received(:exit)
+      expect(build_instance).not_to have_received(:download_build)
     end
   end
 
-  it "downloads the built ios .ipa file" do
+  context "the build succeeds and is located at https://hello.world" do
+    it "downloads the built ios .ipa file" do
+      ok_exit_status = 0
+      build_link = "https://hello.world"
+      write_app_json(with_version: "1.0.0")
+      allow(build_instance).to receive(:print)
+      allow($stdin).to receive(:gets).and_return("patch\n")
+      allow(Open3).to receive(:capture3).with("expo build:ios").and_return([
+        successful_expo_build_output(build_link: build_link),
+        "",
+        ok_exit_status,
+      ])
+
+      fake_path = instance_double(String)
+      fake_tempfile = double
+      http_double = instance_double(URI::HTTP)
+      allow(fake_tempfile).to receive(:path).and_return(fake_path)
+      allow(URI).to receive(:parse).with(build_link).and_return(http_double)
+      allow(http_double).to receive(:open).and_return(fake_tempfile)
+      allow(fake_tempfile).to receive(:close)
+      allow(FileUtils).to receive(:mv)
+
+      Doodlesack::Build.run
+
+      expect(fake_tempfile).to have_received(:close)
+      expect(FileUtils).to have_received(:mv).with(fake_path, "ios_build.ipa")
+    end
+  end
+
+  context "the build succeeds and is located at http://what.is.jeopardy" do
+    it "downloads the built ios .ipa file" do
+      ok_exit_status = 0
+      build_link = "http://what.is.jeopardy"
+      write_app_json(with_version: "1.0.0")
+      allow(build_instance).to receive(:print)
+      allow($stdin).to receive(:gets).and_return("patch\n")
+      allow(Open3).to receive(:capture3).with("expo build:ios").and_return([
+        successful_expo_build_output(build_link: build_link),
+        "",
+        ok_exit_status,
+      ])
+
+      fake_path = instance_double(String)
+      fake_tempfile = double
+      http_double = instance_double(URI::HTTP)
+      allow(fake_tempfile).to receive(:path).and_return(fake_path)
+      allow(URI).to receive(:parse).with(build_link).and_return(http_double)
+      allow(http_double).to receive(:open).and_return(fake_tempfile)
+      allow(fake_tempfile).to receive(:close)
+      allow(FileUtils).to receive(:mv)
+
+      Doodlesack::Build.run
+
+      expect(fake_tempfile).to have_received(:close)
+      expect(FileUtils).to have_received(:mv).with(fake_path, "ios_build.ipa")
+    end
+  end
+
+  it "uploads the built ios .ipa file to app store connect" do
     ok_exit_status = 0
     build_link = "https://hello.world"
     write_app_json(with_version: "1.0.0")
+    allow(build_instance).to receive(:print)
+    allow(build_instance).to receive(:system)
     allow($stdin).to receive(:gets).and_return("patch\n")
     allow(Open3).to receive(:capture3).with("expo build:ios").and_return([
       successful_expo_build_output(build_link: build_link),
@@ -174,19 +239,29 @@ describe Doodlesack::Build do
       ok_exit_status,
     ])
 
-    fake_path = instance_double(String)
-    fake_tempfile = double
-    http_double = instance_double(URI::HTTP)
-    allow(fake_tempfile).to receive(:path).and_return(fake_path)
-    allow(URI).to receive(:parse).with(build_link).and_return(http_double)
-    allow(http_double).to receive(:open).and_return(fake_tempfile)
-    allow(fake_tempfile).to receive(:close)
-    allow(FileUtils).to receive(:mv)
+    Doodlesack::Build.run
+
+    expect(build_instance).to have_received(:system).with(
+      "xcrun altool --upload-app -f ios_build.ipa -u nick@pachulski.me -p yxuz-itgt-qulp-qjgt"
+    )
+  end
+
+  it "deletes the downloaded iOS .ipa standalone build file" do
+    ok_exit_status = 0
+    build_link = "https://hello.world"
+    write_app_json(with_version: "1.0.0")
+    allow(build_instance).to receive(:print)
+    allow(build_instance).to receive(:system)
+    allow($stdin).to receive(:gets).and_return("patch\n")
+    allow(Open3).to receive(:capture3).with("expo build:ios").and_return([
+      successful_expo_build_output(build_link: build_link),
+      "",
+      ok_exit_status,
+    ])
 
     Doodlesack::Build.run
 
-    expect(fake_tempfile).to have_received(:close)
-    expect(FileUtils).to have_received(:mv).with(fake_path, "ios_build.ipa")
+    expect(build_instance).to have_received(:system).with("rm ios_build.ipa")
   end
 
   def successful_expo_build_output(build_link:)
