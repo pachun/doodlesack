@@ -14,7 +14,7 @@ describe Doodlesack::Build do
 
   it "asks the user which type of update they're building for" do
     allow(build_instance).to receive(:download_build)
-    stub_expo_build
+    stub_expo_build(:success)
     write_app_json(with_version: "1.0.0")
     allow($stdin).to receive(:gets).and_return("\n")
 
@@ -29,7 +29,7 @@ describe Doodlesack::Build do
     it "bumps the major version number in app.json" do
       allow(build_instance).to receive(:print)
       allow(build_instance).to receive(:download_build)
-      stub_expo_build
+      stub_expo_build(:success)
       write_app_json(with_version: "1.0.0")
       allow($stdin).to receive(:gets).and_return("major\n")
 
@@ -49,7 +49,7 @@ describe Doodlesack::Build do
     it "bumps the minor version number in app.json" do
       allow(build_instance).to receive(:print)
       allow(build_instance).to receive(:download_build)
-      stub_expo_build
+      stub_expo_build(:success)
       write_app_json(with_version: "1.0.0")
       allow($stdin).to receive(:gets).and_return("minor\n")
 
@@ -69,7 +69,7 @@ describe Doodlesack::Build do
     it "bumps the patch version number in app.json" do
       allow(build_instance).to receive(:print)
       allow(build_instance).to receive(:download_build)
-      stub_expo_build
+      stub_expo_build(:success)
       write_app_json(with_version: "1.0.0")
       allow($stdin).to receive(:gets).and_return("patch\n")
 
@@ -199,16 +199,11 @@ describe Doodlesack::Build do
 
   context "the build succeeds and is located at http://what.is.jeopardy" do
     it "downloads the built ios .ipa file" do
-      ok_exit_status = 0
-      build_link = "http://what.is.jeopardy"
       write_app_json(with_version: "1.0.0")
       allow(build_instance).to receive(:print)
       allow($stdin).to receive(:gets).and_return("patch\n")
-      allow(Open3).to receive(:capture3).with("expo build:ios").and_return([
-        successful_expo_build_output(build_link: build_link),
-        "",
-        ok_exit_status,
-      ])
+      build_link = "http://what.is.jeopardy"
+      stub_expo_build(:success, build_link: build_link)
 
       fake_path = instance_double(String)
       fake_tempfile = double
@@ -336,9 +331,14 @@ describe Doodlesack::Build do
     END_OF_STRING
   end
 
-  def stub_expo_build
-    allow(Open3).to receive(:capture3).with("expo build:ios")
-      .and_return(["", "", 0])
+  def stub_expo_build(success, options = {})
+    output = successful_expo_build_output(build_link: options[:build_link])
+    error = options[:error]
+    allow(Open3).to receive(:capture3).with("expo build:ios").and_return([
+      output,
+      error,
+      success == :success ? 0 : 1,
+    ])
   end
 
   def write_app_json(with_version:)
