@@ -87,11 +87,10 @@ describe Doodlesack::Build do
 
   it "builds the ios app" do
     allow(build_instance).to receive(:download_build)
-    ok_exit_status = 0
     allow(build_instance).to receive(:print)
     write_app_json(with_version: "1.0.0")
     allow($stdin).to receive(:gets).and_return("patch\n")
-    allow(Open3).to receive(:capture3).and_return(["", "", ok_exit_status])
+    stub_expo_build(:success)
 
     Doodlesack::Build.run
 
@@ -99,15 +98,10 @@ describe Doodlesack::Build do
   end
 
   it "does not print an error" do
-    ok_exit_status = 0
     write_app_json(with_version: "1.0.0")
     allow(build_instance).to receive(:download_build)
     allow($stdin).to receive(:gets).and_return("patch\n")
-    allow(Open3).to receive(:capture3).with("expo build:ios").and_return([
-      "",
-      "error",
-      ok_exit_status,
-    ])
+    stub_expo_build(:success, error: "error")
 
     expect {
       Doodlesack::Build.run
@@ -118,14 +112,9 @@ describe Doodlesack::Build do
 
   context "the ios app build fails" do
     it "prints the error returned by `expo build:ios`" do
-      error_exit_status = 1
       write_app_json(with_version: "1.0.0")
+      stub_expo_build(:error, error: "some error")
       allow($stdin).to receive(:gets).and_return("patch\n")
-      allow(Open3).to receive(:capture3).with("expo build:ios").and_return([
-        "",
-        "some error",
-        error_exit_status,
-      ])
 
       expect {
         Doodlesack::Build.run
@@ -135,15 +124,10 @@ describe Doodlesack::Build do
     end
 
     it "does not modify the version in app.json" do
-      error_exit_status = 1
-      allow(build_instance).to receive(:print)
+      stub_expo_build(:error)
       write_app_json(with_version: "1.0.0")
+      allow(build_instance).to receive(:print)
       allow($stdin).to receive(:gets).and_return("patch\n")
-      allow(Open3).to receive(:capture3).with("expo build:ios").and_return([
-        nil,
-        "some error",
-        error_exit_status,
-      ])
 
       expect {
         Doodlesack::Build.run
@@ -151,16 +135,11 @@ describe Doodlesack::Build do
     end
 
     it "does not download anything" do
-      error_exit_status = 1
+      write_app_json(with_version: "1.0.0")
+      stub_expo_build(:error)
       allow(build_instance).to receive(:download_build)
       allow(build_instance).to receive(:print)
-      write_app_json(with_version: "1.0.0")
       allow($stdin).to receive(:gets).and_return("patch\n")
-      allow(Open3).to receive(:capture3).with("expo build:ios").and_return([
-        nil,
-        "some error",
-        error_exit_status,
-      ])
 
       Doodlesack::Build.run
 
@@ -170,16 +149,11 @@ describe Doodlesack::Build do
 
   context "the build succeeds and is located at https://hello.world" do
     it "downloads the built ios .ipa file" do
-      ok_exit_status = 0
       build_link = "https://hello.world"
+      stub_expo_build(:success, build_link: build_link)
       write_app_json(with_version: "1.0.0")
       allow(build_instance).to receive(:print)
       allow($stdin).to receive(:gets).and_return("patch\n")
-      allow(Open3).to receive(:capture3).with("expo build:ios").and_return([
-        successful_expo_build_output(build_link: build_link),
-        "",
-        ok_exit_status,
-      ])
 
       fake_path = instance_double(String)
       fake_tempfile = double
@@ -199,11 +173,11 @@ describe Doodlesack::Build do
 
   context "the build succeeds and is located at http://what.is.jeopardy" do
     it "downloads the built ios .ipa file" do
+      build_link = "http://what.is.jeopardy"
+      stub_expo_build(:success, build_link: build_link)
       write_app_json(with_version: "1.0.0")
       allow(build_instance).to receive(:print)
       allow($stdin).to receive(:gets).and_return("patch\n")
-      build_link = "http://what.is.jeopardy"
-      stub_expo_build(:success, build_link: build_link)
 
       fake_path = instance_double(String)
       fake_tempfile = double
@@ -222,17 +196,12 @@ describe Doodlesack::Build do
   end
 
   it "uploads the built ios .ipa file to app store connect" do
-    ok_exit_status = 0
     build_link = "https://hello.world"
+    stub_expo_build(:success, build_link: build_link)
     write_app_json(with_version: "1.0.0")
     allow(build_instance).to receive(:print)
     allow(build_instance).to receive(:system)
     allow($stdin).to receive(:gets).and_return("patch\n")
-    allow(Open3).to receive(:capture3).with("expo build:ios").and_return([
-      successful_expo_build_output(build_link: build_link),
-      "",
-      ok_exit_status,
-    ])
 
     Doodlesack::Build.run
 
@@ -242,17 +211,12 @@ describe Doodlesack::Build do
   end
 
   it "deletes the downloaded iOS .ipa standalone build file" do
-    ok_exit_status = 0
     build_link = "https://hello.world"
+    stub_expo_build(:success, build_link: build_link)
     write_app_json(with_version: "1.0.0")
     allow(build_instance).to receive(:print)
     allow(build_instance).to receive(:system)
     allow($stdin).to receive(:gets).and_return("patch\n")
-    allow(Open3).to receive(:capture3).with("expo build:ios").and_return([
-      successful_expo_build_output(build_link: build_link),
-      "",
-      ok_exit_status,
-    ])
 
     Doodlesack::Build.run
 
